@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import ButtonComponent from "../components/ButtonComponent";
 
 const LoginScreen = () => {
     const [user, setUser] = useState('');
@@ -11,6 +12,7 @@ const LoginScreen = () => {
 
     return (
         <View style={styles.container}>
+            <Image style={styles.logo} source={require('../../../assets/icon.png')}/>
             <Text style={styles.title}>Inicar Sesión</Text>
 
             <TextInput 
@@ -28,9 +30,9 @@ const LoginScreen = () => {
                 secureTextEntry
             />
 
-            <Pressable style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Inicar sesión</Text>
-            </Pressable>
+            <View style={{width: '80%'}}>
+                <ButtonComponent text="Agregar paciente" onPress={handleLogin} />
+            </View>
         </View>
     )
 }
@@ -41,6 +43,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+
+    logo: {
+        width: 120,
+        height: 120,
+        borderRadius: 100,
     },
 
     title: {
@@ -56,18 +64,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         width: '80%'
     },
-
-    button: {
-        backgroundColor: '#9b2fb9',
-        padding: 10,
-        borderRadius: 5,
-        width: '80%'
-    },
-
-    buttonText: {
-        textAlign: 'center',
-        color: '#fff'
-    }
 });
 
 export default LoginScreen;
