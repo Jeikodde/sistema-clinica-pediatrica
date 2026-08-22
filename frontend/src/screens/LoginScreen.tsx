@@ -1,13 +1,33 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
+import { UserContext, useUser } from "../context/UserContext";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+
+export type RootStackParamList = {
+  Login: undefined;
+  Home: undefined;
+  Patient: undefined;
+}
+
+export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
 const LoginScreen = () => {
-    const [user, setUser] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const { setUser } = useUser();
+    const navigation = useNavigation<LoginScreenNavigationProp>();
 
     const handleLogin = () => {
-        console.log({ user, password });
+        if(!username || !password) {
+            alert('Complete fields')
+            return;
+        }
+
+        setUser({ username });
+        navigation.navigate('Home');
     }
 
     return (
@@ -18,8 +38,8 @@ const LoginScreen = () => {
             <TextInput 
                 style={styles.input}
                 placeholder="Usuario"
-                value={user}
-                onChangeText={setUser}
+                value={username}
+                onChangeText={setUsername}
             />
 
             <TextInput 
@@ -31,7 +51,7 @@ const LoginScreen = () => {
             />
 
             <View style={{width: '80%'}}>
-                <ButtonComponent text="Agregar paciente" onPress={handleLogin} />
+                <ButtonComponent text="Iniciar sesión" onPress={handleLogin} />
             </View>
         </View>
     )

@@ -8,7 +8,7 @@ interface Patient {
     name: string;
 }
 
-const UserInterfaceScreen = () => {
+const PatientScreen = () => {
     const [inputText, setInputText] = useState<string>('');
     const [patients, setPatients] = useState<Patient[]>([]);
     const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -160,4 +160,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default UserInterfaceScreen;
+export default PatientScreen;

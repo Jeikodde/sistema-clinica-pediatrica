@@ -1,11 +1,24 @@
-import AdminProfileScreen from './frontend/src/screens/AdminProfileScreen';
-import AppointmentsApp from './frontend/src/screens/AppointmentScreen';
-import HomeScreen from './frontend/src/screens/HomeScreen';
+import {createNativeStackNavigator, NativeStackNavigationProp} from '@react-navigation/native-stack'
+import { UserProvider } from './frontend/src/context/UserContext';
+import { NavigationContainer } from '@react-navigation/native';
 import LoginScreen from './frontend/src/screens/LoginScreen';
-import MedicalHistoryScreen from './frontend/src/screens/MedicalHistoryScreen';
-import PatientProfileScreen from './frontend/src/screens/PatientProfileScreen';
-import ProfileScreen from './frontend/src/screens/ProfileScreen';
-import SettingsScreen from './frontend/src/screens/SettingsScreen';
-import UserInterfaceScreen from './frontend/src/screens/UserInterfaceScreen';
+import HomeScreen from './frontend/src/screens/HomeScreen';
+import PatientScreen from './frontend/src/screens/PatientScreen';
 
-export default PatientProfileScreen;
+const Stack = createNativeStackNavigator();
+
+const App = () => {
+  return (
+    <UserProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName='Login'>
+          <Stack.Screen name='Login' component={LoginScreen} />
+          <Stack.Screen name='Home' component={HomeScreen} />
+          <Stack.Screen name='Patient' component={PatientScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserProvider>
+  );
+}
+
+export default App;
