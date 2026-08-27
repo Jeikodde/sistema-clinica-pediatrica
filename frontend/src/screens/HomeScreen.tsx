@@ -1,7 +1,7 @@
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useUser } from "../context/UserContext";
+import { RootStackParamList, useUser } from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { LoginScreenNavigationProp } from "./LoginScreen";
 
@@ -10,8 +10,8 @@ const HomeScreen = () => {
 
     const navigation = useNavigation<LoginScreenNavigationProp>();
 
-    const goToPatientScreen = () => {
-        navigation.navigate('Patient');
+    const navigateTo = (path: keyof RootStackParamList) => {
+        navigation.navigate(path);
     }
 
     return (
@@ -20,12 +20,12 @@ const HomeScreen = () => {
 
             <View style={styles.buttonContainer} >
                 <MaterialCommunityIcons name="account" size={24} color={'#fff'} />
-                <ButtonComponent text="Perfil" IconComponent={MaterialCommunityIcons} iconName="account" />
-                <ButtonComponent text="Gestión de pacientes"  IconComponent={MaterialCommunityIcons} iconName="account-supervisor" onPress={goToPatientScreen} />
-                <ButtonComponent text="Configuración"  IconComponent={MaterialCommunityIcons} iconName="cog-box" />
-                <ButtonComponent text="Citas"  IconComponent={MaterialCommunityIcons} iconName="list-box" />
-                <ButtonComponent text="Historial Médico"  IconComponent={MaterialCommunityIcons} iconName="list-status" />
-                <ButtonComponent text="Cerrar sesión"  IconComponent={MaterialCommunityIcons} iconName="logout" type="danger" />
+                <ButtonComponent text="Perfil" IconComponent={MaterialCommunityIcons} iconName="account" onPress={() => navigateTo('Profile')} />
+                <ButtonComponent text="Gestión de pacientes"  IconComponent={MaterialCommunityIcons} iconName="account-supervisor" onPress={() => navigateTo('Patient')} />
+                <ButtonComponent text="Configuración"  IconComponent={MaterialCommunityIcons} iconName="cog-box" onPress={ () => navigateTo('Settings') } />
+                <ButtonComponent text="Citas"  IconComponent={MaterialCommunityIcons} iconName="list-box" onPress={ () => navigateTo('Appointments') } />
+                <ButtonComponent text="Historial Médico"  IconComponent={MaterialCommunityIcons} iconName="list-status" onPress={ () => navigateTo('MedicalHistory') } />
+                <ButtonComponent text="Cerrar sesión"  IconComponent={MaterialCommunityIcons} iconName="logout" type="danger" onPress={ () => navigateTo('Login') } />
             </View>
         </View>
     );

@@ -13,6 +13,16 @@ interface UserContextType {
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
 
+export type RootStackParamList = {
+  Login: undefined;
+  Home: undefined;
+  Profile: undefined;
+  Patient: undefined;
+  Settings: undefined;
+  Appointments: undefined;
+  MedicalHistory: undefined;
+}
+
 interface UserProviderProps {
   children: ReactNode;
 }

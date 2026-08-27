@@ -1,16 +1,10 @@
 import { useContext, useState } from "react";
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
-import { UserContext, useUser } from "../context/UserContext";
+import { RootStackParamList, UserContext, useUser } from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-
-export type RootStackParamList = {
-  Login: undefined;
-  Home: undefined;
-  Patient: undefined;
-}
 
 export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
