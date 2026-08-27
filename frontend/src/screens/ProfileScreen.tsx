@@ -1,13 +1,16 @@
 import { StyleSheet, Text, View } from "react-native"
+import { useUser } from "../context/UserContext";
 
 const ProfileScreen = () => {
+    const { user } = useUser();
+
     return (
         <View style={styles.container}>
             <View style={styles.avatar}>
                 <Text style={styles.avatarText}>JD</Text>
             </View>
 
-            <Text style={styles.name}>John Doe</Text>
+            <Text style={styles.name}>{ user?.username }</Text>
             <Text style={styles.email}>john@example.com</Text>
 
             <View style={styles.infoCard}>

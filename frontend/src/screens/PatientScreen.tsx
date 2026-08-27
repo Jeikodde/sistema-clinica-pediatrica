@@ -2,6 +2,7 @@ import { useState } from "react";
 import uuid from 'react-native-uuid';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
+import { useUser } from "../context/UserContext";
 
 interface Patient {
     id: string;
@@ -9,6 +10,8 @@ interface Patient {
 }
 
 const PatientScreen = () => {
+    const { user } = useUser();
+
     const [inputText, setInputText] = useState<string>('');
     const [patients, setPatients] = useState<Patient[]>([]);
     const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -56,7 +59,7 @@ const PatientScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Gestión de Pacientes</Text>
+            <Text style={styles.title}>Gestión de Pacientes: { user?.username }</Text>
 
             <View style={styles.form}>
                 <TextInput

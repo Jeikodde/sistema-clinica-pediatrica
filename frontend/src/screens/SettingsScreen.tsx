@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { StyleSheet, Switch, Text, View } from "react-native"
+import { useUser } from "../context/UserContext";
 
 const SettingsScreen = () => {
+    const { user } = useUser();
+
     const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(false);
     const [darkModeEnabled, setDarkModeEnabled] = useState<boolean>(false);
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Configuración</Text>
+            <Text style={styles.title}>Configuración: { user?.username }</Text>
 
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Preferencias</Text>

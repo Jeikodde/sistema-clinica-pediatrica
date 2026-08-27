@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { useUser } from '../context/UserContext';
 
 interface MedicalRecord {
   id: number;
@@ -34,10 +35,12 @@ const medicalRecords: MedicalRecord[] = [
 ];
 
 const MedicalHistoryScreen =() => {
+  const { user } = useUser();
+
   return (
     <View style={styles.container}>
       <View style={styles.phoneCard}>
-        <Text style={styles.title}>Historia Clínica</Text>
+        <Text style={styles.title}>Historial Clínico: { user?.username }</Text>
 
         <ScrollView style={styles.listContainer}>
           {medicalRecords.map((record) => (
