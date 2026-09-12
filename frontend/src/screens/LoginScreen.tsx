@@ -1,12 +1,10 @@
 import { useContext, useState } from "react";
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
-import { RootStackParamList, UserContext, useUser } from "../context/UserContext";
+import { UserContext, useUser } from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
-
-export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+import { LoginScreenNavigationProp } from "../context/NavigationScreens";
 
 const LoginScreen = () => {
     const [username, setUsername] = useState('');
@@ -21,7 +19,12 @@ const LoginScreen = () => {
         }
 
         setUser({ username });
-        navigation.navigate('Home');
+        navigation.navigate('Main', {
+            screen: 'Tabs', 
+            params: {
+                screen: 'Home'
+            }
+        });
     }
 
     return (
