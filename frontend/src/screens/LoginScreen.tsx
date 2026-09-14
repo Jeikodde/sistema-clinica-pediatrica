@@ -1,10 +1,11 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
 import { UserContext, useUser } from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { LoginScreenNavigationProp } from "../context/NavigationScreens";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = () => {
     const [username, setUsername] = useState('');
@@ -12,19 +13,39 @@ const LoginScreen = () => {
     const { setUser } = useUser();
     const navigation = useNavigation<LoginScreenNavigationProp>();
 
-    const handleLogin = () => {
-        if(!username || !password) {
-            alert('Complete fields')
-            return;
+    useEffect(() => {
+        const checkToken = async () => {
+            const token = await AsyncStorage.getItem('token');
+
+            if(token) {
+                navigateToMain();
+            }
         }
 
-        setUser({ username });
-        navigation.navigate('Main', {
+        checkToken();
+    }, []);
+
+    const navigateToMain = () => {
+        navigation.replace('Main', {
             screen: 'Tabs', 
             params: {
                 screen: 'Home'
             }
         });
+    }
+
+    const handleLogin = async () => {
+        if(!username || !password) {
+            alert('Complete fields')
+            return;
+        }
+
+        await AsyncStorage.setItem('user', username);
+        await AsyncStorage.setItem('token', 'fake-token-123456');
+
+        // setUser({ username });
+
+        navigateToMain();
     }
 
     return (

@@ -4,19 +4,41 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUser } from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { HomeScreenNavigationProp } from "../context/NavigationScreens";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen = () => {
     const { user } = useUser();
 
     const navigation = useNavigation<HomeScreenNavigationProp>();
+    const [username, setUsername] = useState('');
+
+    useEffect( () => {
+        const loadUser = async () => {
+            const storedUser = await AsyncStorage.getItem('user');
+
+            if(storedUser) {
+                setUsername(storedUser );
+            }
+        }
+
+        loadUser();
+    }, []);
 
     // const navigateTo = (path: keyof RootStackParamList) => {
     //      navigation.navigate(path);
     // }
 
+    const handleLogout = async () => {
+        await AsyncStorage.removeItem('user');
+        await AsyncStorage.removeItem('token');
+
+        navigation.reset({ index: 0, routes: [{name: 'Login'}]})
+    }
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Bienvenido { user?.username }, A La Clínica Pediátrica</Text>
+            <Text style={styles.title}>Bienvenido { username }, A La Clínica Pediátrica</Text>
 
             <View style={styles.buttonContainer} >
                 <MaterialCommunityIcons name="account" size={24} color={'#fff'} />
@@ -24,7 +46,9 @@ const HomeScreen = () => {
                 <ButtonComponent text="Patients" IconComponent={ MaterialCommunityIcons} iconName="medical-bag" onPress={() => navigation.navigate('Patients', {
                     screen: 'PatientList'
                 })} />
-                <ButtonComponent text="Ayuda"  IconComponent={MaterialCommunityIcons} iconName="logout" type="danger" onPress={ () => navigation.navigate('Help') } />
+                <ButtonComponent text="Ayuda"  IconComponent={MaterialCommunityIcons} iconName="help" onPress={ () => navigation.navigate('Help') } />
+
+                <ButtonComponent text="Cerrar sesión" IconComponent={MaterialCommunityIcons} iconName="logout" type="danger" onPress={ handleLogout} />
             </View>
         </View>
     );

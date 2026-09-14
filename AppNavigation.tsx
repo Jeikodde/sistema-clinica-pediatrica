@@ -9,10 +9,13 @@ import ProfileScreen from './frontend/src/screens/ProfileScreen';
 import AppointmentsScreen from './frontend/src/screens/AppointmentScreen';
 import MedicalHistoryScreen from './frontend/src/screens/MedicalHistoryScreen';
 import { createStackNavigator } from '@react-navigation/stack';
+import LoginScreen from './frontend/src/screens/LoginScreen';
 
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
+const darkModeEnabled = true;
 
 const AppDrawer = () => {
   return (
@@ -107,7 +110,15 @@ export const PatientStack = () => (
 )
 
 export const AppTabs = () => (
-  <Tab.Navigator>
+  <Tab.Navigator
+    screenOptions={{
+      headerStyle: { backgroundColor: darkModeEnabled ? '#1f2937' : '#fff' },
+      headerTintColor:   darkModeEnabled ? '#fff' : '#1f2937' ,
+      tabBarStyle: { backgroundColor: darkModeEnabled ? '#1f2937' : '#fff' },
+      tabBarActiveTintColor: darkModeEnabled ? '#fff' : '#1f2937' ,
+      tabBarInactiveTintColor: darkModeEnabled ? '#888' : '#999',
+    }}
+  >
     <Tab.Screen 
       name='Home'
       component={ HomeScreen }

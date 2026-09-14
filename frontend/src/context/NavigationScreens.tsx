@@ -13,6 +13,7 @@ export type AppTabsParamList = {
   Patients: NavigatorScreenParams<PatientStackParamList>;
   Help: undefined;
   Profile: undefined;
+  Login: undefined;
 }
 
 export type MainDrawerParamList = {
