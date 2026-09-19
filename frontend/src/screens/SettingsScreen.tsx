@@ -21,8 +21,10 @@ const SettingsScreen = () => {
         loadSettings();
     });
 
-    const toggleDarkMode = (value: boolean) => {
+    const toggleDarkMode = async (value: boolean) => {
         setDarkModeEnabled(value);
+
+        await AsyncStorage.setItem('darkMode', value ? 'true' : 'false');
     }
 
     // Styles
@@ -96,7 +98,7 @@ const SettingsScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Configuración: { user?.username }</Text>
+            <Text style={styles.title}>Configuración: { user?.username } { darkModeEnabled ? 'here' : 'No'}</Text>
 
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Preferencias</Text>

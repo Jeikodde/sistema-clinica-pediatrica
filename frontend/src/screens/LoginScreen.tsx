@@ -11,18 +11,25 @@ const LoginScreen = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { setUser } = useUser();
+
     const navigation = useNavigation<LoginScreenNavigationProp>();
+    const [darkModeEnabled, setDarkModeEnabled] = useState<boolean>(false);
 
     useEffect(() => {
-        const checkToken = async () => {
+        const loadSettings = async () => {
             const token = await AsyncStorage.getItem('token');
+            const darkMode = await AsyncStorage.getItem('darkMode');
 
             if(token) {
                 navigateToMain();
             }
+
+            if(darkMode) {
+                setDarkModeEnabled(!!darkMode);
+            }
         }
 
-        checkToken();
+        loadSettings();
     }, []);
 
     const navigateToMain = () => {
@@ -48,6 +55,37 @@ const LoginScreen = () => {
         navigateToMain();
     }
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: darkModeEnabled ? '#1f2937' : '#fff',
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+
+        logo: {
+            width: 120,
+            height: 120,
+            borderRadius: 100,
+        },
+
+        title: {
+            fontSize: 24,
+            marginVertical: 10,
+            color: darkModeEnabled ? '#fff' : '#1f2937',
+        },
+
+        input: {
+            color: darkModeEnabled ? '#fff' : '#1f2937',
+            borderWidth: 1,
+            borderColor: '#ccc',
+            borderRadius: 5,
+            padding: 10,
+            marginBottom: 10,
+            width: '80%',
+        },
+    });
+
     return (
         <View style={styles.container}>
             <Image style={styles.logo} source={require('../../../assets/icon.png')}/>
@@ -55,6 +93,7 @@ const LoginScreen = () => {
 
             <TextInput 
                 style={styles.input}
+                placeholderTextColor={ darkModeEnabled ? '#969494' : '#1f2937' }
                 placeholder="Usuario"
                 value={username}
                 onChangeText={setUsername}
@@ -62,6 +101,7 @@ const LoginScreen = () => {
 
             <TextInput 
                 style={styles.input}
+                placeholderTextColor={ darkModeEnabled ? '#969494' : '#1f2937' }
                 placeholder="Contraseña"
                 value={password}
                 onChangeText={setPassword}
@@ -74,34 +114,5 @@ const LoginScreen = () => {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    logo: {
-        width: 120,
-        height: 120,
-        borderRadius: 100,
-    },
-
-    title: {
-        fontSize: 24,
-        marginVertical: 10,
-    },
-
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 10,
-        marginBottom: 10,
-        width: '80%'
-    },
-});
 
 export default LoginScreen;

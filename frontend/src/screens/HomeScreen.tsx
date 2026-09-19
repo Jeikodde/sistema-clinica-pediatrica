@@ -12,13 +12,19 @@ const HomeScreen = () => {
 
     const navigation = useNavigation<HomeScreenNavigationProp>();
     const [username, setUsername] = useState('');
+    const [darkModeEnabled, setDarkModeEnabled] = useState<boolean>(false);
 
     useEffect( () => {
         const loadUser = async () => {
             const storedUser = await AsyncStorage.getItem('user');
+            const darkMode = await AsyncStorage.getItem('darkMode');
 
             if(storedUser) {
                 setUsername(storedUser );
+            }
+
+            if(darkMode) {
+                setDarkModeEnabled(!!darkMode);
             }
         }
 
@@ -36,12 +42,34 @@ const HomeScreen = () => {
         navigation.reset({ index: 0, routes: [{name: 'Login'}]})
     }
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: darkModeEnabled ? '#1f2937' : '#fff',
+            padding: 16,
+        },
+
+        title: {
+            fontSize: 24,
+            fontWeight: '600',
+            marginBottom: 20,
+            color: '#005187',
+            textAlign: 'center'
+        },
+
+        buttonContainer: {
+            width: '80%',
+            gap: 8
+        }
+    });
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Bienvenido { username }, A La Clínica Pediátrica</Text>
 
             <View style={styles.buttonContainer} >
-                <MaterialCommunityIcons name="account" size={24} color={'#fff'} />
                 <ButtonComponent text="Perfil" IconComponent={MaterialCommunityIcons} iconName="account" onPress={() => navigation.navigate('Profile')} />
                 <ButtonComponent text="Patients" IconComponent={ MaterialCommunityIcons} iconName="medical-bag" onPress={() => navigation.navigate('Patients', {
                     screen: 'PatientList'
@@ -53,28 +81,5 @@ const HomeScreen = () => {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
-        padding: 16,
-    },
-
-    title: {
-        fontSize: 24,
-        fontWeight: '600',
-        marginBottom: 20,
-        color: '#005187',
-        textAlign: 'center'
-    },
-
-    buttonContainer: {
-        width: '80%',
-        gap: 8
-    }
-})
 
 export default HomeScreen;

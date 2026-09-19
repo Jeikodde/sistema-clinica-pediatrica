@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import uuid from 'react-native-uuid';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
 import { useUser } from "../context/UserContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface Patient {
     id: string;
@@ -16,6 +17,20 @@ const PatientScreen = () => {
     const [patients, setPatients] = useState<Patient[]>([]);
     const [isFocused, setIsFocused] = useState<boolean>(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+
+    const [darkModeEnabled, setDarkModeEnabled] = useState<boolean>(false);
+    
+    useEffect( () => {
+        const loadSettings = async () => {
+            const darkMode = await AsyncStorage.getItem('darkMode');
+
+            if(darkMode) {
+                setDarkModeEnabled(!!darkMode);
+            }
+        }
+
+        loadSettings();
+    });
 
     const addPatient = () => {
         const newPatient: Patient = {
@@ -56,6 +71,71 @@ const PatientScreen = () => {
     const deletePatient = (id: string) => {
         setPatients((prev) => prev.filter(patient => patient.id !== id));
     }
+
+    const styles = StyleSheet.create({
+    container: {
+        flexGrow: 1,
+        alignItems: 'center',
+        padding: 20,
+        paddingTop: 50,
+        backgroundColor: darkModeEnabled ? '#1f2937' : '#eaeeff'
+    },
+
+    title: {
+        fontSize: 20,
+        fontWeight: '600',
+        color: darkModeEnabled ? '#fff' : '#005187',
+        marginBottom: 20,
+    },
+
+    form: {
+        width: '80%',
+        gap: 8,
+        marginBottom: 8,
+    },
+
+    input: {
+        height: 50,
+        borderColor: darkModeEnabled ? '#4b5563' : '#005187',
+        borderWidth: 1,
+        borderRadius: 10,
+        padding: 10,
+        width: '100%',
+        backgroundColor: darkModeEnabled ? '#374151' : '#fff',
+        color: darkModeEnabled ? '#fff' : '#000'
+    },
+
+    counter: {
+        margin: 15,
+        fontSize: 16,
+        fontWeight: '600',
+        color: darkModeEnabled ? '#fff' : '#000'
+    },
+
+    patientList: {
+        padding: 10,
+        margin: 10,
+        backgroundColor: darkModeEnabled ? '#374151' : '#fff',
+        borderRadius: 10,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: darkModeEnabled ? '#4b5563' : '#ccc'
+    },
+
+    patientValue: {
+        fontSize: 19,
+        margin: 10,
+        flexWrap: 'wrap',
+        color: darkModeEnabled ? '#fff' : '#000'
+    },
+
+    actionsGroup: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        gap: 8,
+    },
+});
 
     return (
         <View style={styles.container}>
@@ -101,66 +181,5 @@ const PatientScreen = () => {
         </View>
     )
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        alignItems: 'center',
-        padding: 20,
-        paddingTop: 50,
-        backgroundColor: '#eaeeff'
-    },
-
-    title: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#005187',
-        marginBottom: 20,
-    },
-
-    form: {
-        width: '80%',
-        gap: 8,
-        marginBottom: 8,
-    },
-
-    input: {
-        height: 50,
-        borderColor: '#005187',
-        borderWidth: 1,
-        borderRadius: 10,
-        padding: 10,
-        width: '100%',
-        backgroundColor: '#fff'
-    },
-
-    counter: {
-        margin: 15,
-        fontSize: 16,
-        fontWeight:'600'
-    },
-
-    patientList: {
-        padding: 10,
-        margin: 10,
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        alignItems: 'center',
-        borderWidth: 1,
-    },
-
-    patientValue: {
-        fontSize: 19,
-        margin: 10,
-        flexWrap: 'wrap'
-    },
-
-    actionsGroup: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        gap: 8,
-    },
-});
 
 export default PatientScreen;
