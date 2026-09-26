@@ -1,22 +1,26 @@
 import { useEffect, useState } from "react";
 import uuid from 'react-native-uuid';
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
 import { useUser } from "../context/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSQLiteContext } from "expo-sqlite";
 
 interface Patient {
-    id: string;
+    id: number;
     name: string;
 }
 
 const PatientScreen = () => {
+    const db = useSQLiteContext();
+    // const [editingId, setEditingId] = useState<number | null>(null);
+
     const { user } = useUser();
 
     const [inputText, setInputText] = useState<string>('');
     const [patients, setPatients] = useState<Patient[]>([]);
     const [isFocused, setIsFocused] = useState<boolean>(false);
-    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editingId, setEditingId] = useState<number | null>(null);
 
     const [darkModeEnabled, setDarkModeEnabled] = useState<boolean>(false);
     
@@ -30,15 +34,35 @@ const PatientScreen = () => {
         }
 
         loadSettings();
+        loadPatients();
     });
 
-    const addPatient = () => {
-        const newPatient: Patient = {
-            id: uuid.v4(),
-            name: inputText
+    const loadPatients = async () => {
+        const patients = await db.getAllAsync<Patient>('SELECT * FROM patients');
+
+        setPatients(patients);
+    }
+
+    const addPatient = async () => {
+        if(inputText.trim()) {
+            if(editingId) {
+                await db.runAsync('UPDATE patients SET name = ? WHERE id = ?', [inputText.trim(), editingId]);
+
+                setEditingId(null);
+                Alert.alert('Success', 'Patient updated successfully');
+            } else {
+                await db.runAsync('INSERT INTO patients (name) VALUES (?)', [inputText.trim()]);
+
+                Alert.alert('Success', 'Patient added successfully');
+
+                setInputText('');
+                loadPatients();
+            }
+        } else {
+            Alert.alert('Error', 'Name could not be empty');
         }
 
-        setPatients([...patients, newPatient]);
+        setInputText('');
     }
 
     const startEdit = (patient: Patient) => {
@@ -51,25 +75,30 @@ const PatientScreen = () => {
             return;
         }
 
-        setInputText('');
+        // setInputText('');
 
         if(editingId) {
-            editPatient();
-            return;
+            editPatient(editingId);
         } 
 
         addPatient();
 
     }
 
-    const editPatient = () => {
-        setPatients((prev) => 
-            prev.map(patient => (patient.id === patient.id) ? { ...patient, name: patient.name } : patient)
-        );
+    const editPatient = (id: number) => {
+        const patient = patients.find(p => p.id === id);
+
+        if(patient) {
+            setEditingId(patient.id);
+        }
     }
 
-    const deletePatient = (id: string) => {
-        setPatients((prev) => prev.filter(patient => patient.id !== id));
+    const deletePatient =  async (id: number) => {
+        await db.runAsync('DELETE FROM patients WHERE id = ?', [id]);
+
+        loadPatients();
+
+        Alert.alert('Success', 'Patient deleted successfully');
     }
 
     const styles = StyleSheet.create({
@@ -155,7 +184,7 @@ const PatientScreen = () => {
                     onBlur={ () => setIsFocused(false) }
                 />
 
-                <ButtonComponent text="Agregar paciente" onPress={savePatient} />
+                <ButtonComponent text={ editingId ?  'Actualizar paciente' : 'Agregar paciente'} onPress={savePatient} />
             </View>
 
             <Text style={styles.counter}>Pacientes registrados: { patients.length }</Text>
@@ -163,7 +192,7 @@ const PatientScreen = () => {
             <View style={{width: '100%'}}>
                 <FlatList 
                 data={patients}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={{ alignItems: 'stretch' }}
                 renderItem={({item}) => (
                     <View style={styles.patientList}>
