@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const usuarioSchema = new mongoose.Schema({
-    nombreUsuario: {
+    name: {
         type: String,
         required: true,
         unique: true
     },
-    contrasena: {
+    password: {
         type: String,
         required: true
     },
@@ -20,11 +20,11 @@ const usuarioSchema = new mongoose.Schema({
 
 // Hash password before saving
 usuarioSchema.pre('save', async function(next) {
-    if (!this.isModified('contrasena')) return next();
+    if (!this.isModified('password')) return next();
 
     const salt = await bcrypt.genSalt(10);
-    this.contrasena = await bcrypt.hash(this.contrasena, salt);
-    next();
+    this.password = await bcrypt.hash(this.password, salt);
+    // next();
 });
 
 module.exports = mongoose.model('Usuario', usuarioSchema);

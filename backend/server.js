@@ -10,7 +10,9 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/sistema-clinica');
+mongoose.connect('mongodb://localhost:27017/sistema-clinica')
+    .then( () => console.log('Connection to mongodb successfully'))
+    .catch( () => console.error('Error to connect to mongodb'))
 
 // Define routes
 const authRoutes = require('./routes/auth');
