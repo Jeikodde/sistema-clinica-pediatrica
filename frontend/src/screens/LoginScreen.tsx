@@ -108,8 +108,9 @@ const LoginScreen = () => {
                 secureTextEntry
             />
 
-            <View style={{width: '80%'}}>
+            <View style={{width: '80%', gap: 10}} >
                 <ButtonComponent text="Iniciar sesión" onPress={handleLogin} />
+                <ButtonComponent text="Registrarse" onPress={() => navigation.navigate('Register')} />
             </View>
         </View>
     )

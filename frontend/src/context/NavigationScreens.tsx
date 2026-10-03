@@ -23,7 +23,8 @@ export type MainDrawerParamList = {
 
 export type RootStackParamList = {
   Login: undefined;
-  Main: NavigatorScreenParams<MainDrawerParamList>
+  Main: NavigatorScreenParams<MainDrawerParamList>;
+  Register: undefined;
 }
 
 
