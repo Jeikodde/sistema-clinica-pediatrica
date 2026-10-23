@@ -1,11 +1,14 @@
 import { useContext, useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
 import { UserContext, useUser } from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { LoginScreenNavigationProp } from "../context/NavigationScreens";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+
+const BASE_URL = Platform.OS === 'android' ? 'http://192.168.1.89:5000' : 'http://localhost:5000';
 
 const LoginScreen = () => {
     const [username, setUsername] = useState('');
@@ -14,6 +17,9 @@ const LoginScreen = () => {
 
     const navigation = useNavigation<LoginScreenNavigationProp>();
     const [darkModeEnabled, setDarkModeEnabled] = useState<boolean>(false);
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const loadSettings = async () => {
@@ -47,12 +53,33 @@ const LoginScreen = () => {
             return;
         }
 
-        await AsyncStorage.setItem('user', username);
-        await AsyncStorage.setItem('token', 'fake-token-123456');
+        setLoading(true);
 
-        // setUser({ username });
+        try {
+            const res = await axios.post(`${BASE_URL}/api/auth/login`, {
+                name: username.trim(),
+                password: password
+            });
 
-        navigateToMain();
+            const { token } = res.data;
+            
+            if(token) {
+                alert('Login successful');
+                await AsyncStorage.setItem('token', token);
+                await AsyncStorage.setItem('user', username);
+                setLoading(false);
+                navigateToMain();
+                return;
+            }
+
+            setLoading(false);
+            setError('Invalid credentials');
+            alert('Invalid credentials');
+        } catch(error) {
+            setLoading(false);
+            setError('An error occurred while logging in');
+            alert(`An error occurred while logging in`);
+        }
     }
 
     const styles = StyleSheet.create({
@@ -111,6 +138,7 @@ const LoginScreen = () => {
             <View style={{width: '80%', gap: 10}} >
                 <ButtonComponent text="Iniciar sesión" onPress={handleLogin} />
                 <ButtonComponent text="Registrarse" onPress={() => navigation.navigate('Register')} />
+                    <Text style={{color: 'red'}}>{error}</Text>
             </View>
         </View>
     )

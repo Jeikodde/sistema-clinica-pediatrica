@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Platform, StyleSheet, Text, TextInput, View } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
+import axios from "axios";
+
+const BASE_URL = Platform.OS === 'android' ? 'http://192.168.1.89:5000' : 'http://localhost:5000';
 
 const RegisterScreen = ({ navigation }: any) => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (!username.trim() || !password.trim() || !confirmPassword.trim()) {
             Alert.alert('Error', 'Todos los campos son obligatorios');
             return;
@@ -18,8 +21,18 @@ const RegisterScreen = ({ navigation }: any) => {
             return;
         }
 
-        Alert.alert('Éxito', 'Usuario registrado correctamente');
-        navigation.goBack();
+        try {
+            const response = await axios.post(`${BASE_URL}/api/auth/register`, {
+                name: username,
+                password,
+                role: 'user'
+            });
+            Alert.alert('Éxito', 'Usuario registrado correctamente');
+            navigation.goBack();
+        } catch (error) {
+            Alert.alert('Error', 'Error al registrar el usuario');
+            console.log(error);
+        }
     };
 
     return (
@@ -35,6 +48,7 @@ const RegisterScreen = ({ navigation }: any) => {
                     onChangeText={setUsername}
                     autoCapitalize="none"
                 />
+
                 <TextInput
                     style={styles.input}
                     placeholder="Contraseña"

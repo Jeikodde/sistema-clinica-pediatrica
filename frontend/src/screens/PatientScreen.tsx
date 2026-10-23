@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
-import { Alert, FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, FlatList, Platform, StyleSheet, Text, TextInput, View } from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
 import { useUser } from "../context/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSQLiteContext } from "expo-sqlite";
+import axios from "axios";
 
 interface Patient {
-    id: number;
+    _id: number;
     name: string;
     address: string | null;
     phone: string | null;
     birth_date: string | null;
     email: string | null;
 }
+const BASE_URL = Platform.OS === 'android' ? 'http://192.168.1.89:5000' : 'http://localhost:5000';
 
 const PatientScreen = () => {
     const db = useSQLiteContext();
@@ -32,17 +34,25 @@ const PatientScreen = () => {
     useEffect(() => {
         const loadSettings = async () => {
             const darkMode = await AsyncStorage.getItem('darkMode');
-            if (darkMode) {
-                setDarkModeEnabled(!!darkMode);
+            if (darkMode !== null) {
+                setDarkModeEnabled(darkMode === 'true');
             }
         };
         loadSettings();
         loadPatients();
-    });
+    }, []);
 
     const loadPatients = async () => {
-        const result = await db.getAllAsync<Patient>('SELECT * FROM Patients');
-        setPatients(result);
+        try {
+            const result = await axios.get<Patient[]>(`${BASE_URL}/api/patient`);
+            console.log('Patients loaded:', result.data);
+            setPatients(result.data);
+        } catch (error) {
+            console.error('Error loading patients:', error);
+            Alert.alert('Error', 'An error occurred while loading patients');
+        }
+
+        // const result = await db.getAllAsync<Patient>('SELECT * FROM Patients');
     };
 
     const clearForm = () => {
@@ -61,16 +71,30 @@ const PatientScreen = () => {
         }
 
         if (editingId) {
-            await db.runAsync(
-                'UPDATE Patients SET name = ?, address = ?, phone = ?, birth_date = ?, email = ? WHERE id = ?',
-                [inputText.trim(), inputAddress.trim(), inputPhone.trim(), inputBirthDate.trim(), inputEmail.trim(), editingId]
-            );
+            // await db.runAsync(
+            //     'UPDATE Patients SET name = ?, address = ?, phone = ?, birth_date = ?, email = ? WHERE id = ?',
+            //     [inputText.trim(), inputAddress.trim(), inputPhone.trim(), inputBirthDate.trim(), inputEmail.trim(), editingId]
+            // );
+            await axios.put(`${BASE_URL}/api/patient/${editingId}`, {
+                name: inputText.trim(),
+                address: inputAddress.trim(),
+                phone: inputPhone.trim(),
+                birth_date: inputBirthDate.trim(),
+                email: inputEmail.trim()
+            });
             Alert.alert('Éxito', 'Paciente actualizado correctamente');
         } else {
-            await db.runAsync(
-                'INSERT INTO Patients (name, address, phone, birth_date, email) VALUES (?, ?, ?, ?, ?)',
-                [inputText.trim(), inputAddress.trim(), inputPhone.trim(), inputBirthDate.trim(), inputEmail.trim()]
-            );
+            // await db.runAsync(
+            //     'INSERT INTO Patients (name, address, phone, birth_date, email) VALUES (?, ?, ?, ?, ?)',
+            //     [inputText.trim(), inputAddress.trim(), inputPhone.trim(), inputBirthDate.trim(), inputEmail.trim()]
+            // );
+            await axios.post(`${BASE_URL}/api/patient`, {
+                name: inputText.trim(),
+                address: inputAddress.trim(),
+                phone: inputPhone.trim(),
+                birth_date: inputBirthDate.trim(),
+                email: inputEmail.trim()
+            });
             Alert.alert('Éxito', 'Paciente agregado correctamente');
         }
 
@@ -84,11 +108,12 @@ const PatientScreen = () => {
         setInputPhone(patient.phone ?? '');
         setInputBirthDate(patient.birth_date ?? '');
         setInputEmail(patient.email ?? '');
-        setEditingId(patient.id);
+        setEditingId(patient._id);
     };
 
     const deletePatient = async (id: number) => {
-        await db.runAsync('DELETE FROM Patients WHERE id = ?', [id]);
+        // await db.runAsync('DELETE FROM Patients WHERE id = ?', [id]);
+        await axios.delete(`${BASE_URL}/api/patient/${id}`);
         loadPatients();
         Alert.alert('Éxito', 'Paciente eliminado correctamente');
     };
@@ -157,7 +182,7 @@ const PatientScreen = () => {
         },
     });
 
-    const ListHeader = () => (
+    const listHeader = (
         <View style={styles.form}>
             <Text style={styles.title}>Gestión de Pacientes: {user?.username}</Text>
             <TextInput
@@ -215,8 +240,8 @@ const PatientScreen = () => {
         <View style={styles.container}>
             <FlatList
                 data={patients}
-                keyExtractor={(item) => item.id.toString()}
-                ListHeaderComponent={ListHeader}
+                keyExtractor={(item) => item._id.toString()}
+                ListHeaderComponent={listHeader}
                 renderItem={({ item }) => (
                     <View style={styles.patientCard}>
                         <Text style={styles.patientName}>{item.name}</Text>
@@ -226,7 +251,7 @@ const PatientScreen = () => {
                         <Text style={styles.patientField}> {item.email ?? 'Sin correo'}</Text>
                         <View style={styles.actionsGroup}>
                             <ButtonComponent text="Editar" type="edit" onPress={() => startEdit(item)} />
-                            <ButtonComponent text="Eliminar" type="danger" onPress={() => deletePatient(item.id)} />
+                            <ButtonComponent text="Eliminar" type="danger" onPress={() => deletePatient(item._id)} />
                         </View>
                     </View>
                 )}
