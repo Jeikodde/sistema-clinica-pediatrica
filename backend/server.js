@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://juanunob_db_user:lhQZXOvfHHlX6tvA@cluster0.rz5czna.mongodb.net/sistema-clicica')
+mongoose.connect('SERVER-NAME')
     .then( () => console.log('Connection to mongodb successfully'))
     .catch( (error) => console.error('Error to connect to mongodb', error))
 
